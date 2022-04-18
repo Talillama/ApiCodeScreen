@@ -10,22 +10,18 @@ namespace ApiCodeScreen
 {
     class Program
     {
+        const string dataSourceUrl = "https://k7o2mgxtv8.execute-api.us-east-1.amazonaws.com/public/manufacturers";
+        const string carNamesPostUrl = "https://k7o2mgxtv8.execute-api.us-east-1.amazonaws.com/public/names";
+        const string carColorsPostUrl = "https://k7o2mgxtv8.execute-api.us-east-1.amazonaws.com/public/colors";
+
         static void Main(string[] args)
         {
-            const string dataSourceUrl = "https://k7o2mgxtv8.execute-api.us-east-1.amazonaws.com/public/manufacturers";
-            const string carNamesPostUrl = "https://k7o2mgxtv8.execute-api.us-east-1.amazonaws.com/public/names";
-            const string carColorsPostUrl = "https://k7o2mgxtv8.execute-api.us-east-1.amazonaws.com/public/colors";
-            var httpClient = new HttpClient();
-
-            /**
-             * TODO
-             */
-            var data = GetManufacturers(dataSourceUrl);
-            PostFordCarsAlphabetically(carNamesPostUrl, data);
-            PostCarColors(carColorsPostUrl, data);
+            var data = GetManufacturers();
+            PostFordCarsAlphabetically(data);
+            PostCarColors(data);
         }
 
-        private static string GetManufacturers(string dataSourceUrl)
+        private static string GetManufacturers()
         {
             var url = dataSourceUrl;
 
@@ -46,7 +42,7 @@ namespace ApiCodeScreen
             return data;
         }
 
-        private static void PostFordCarsAlphabetically(string carNamesPostUrl, string data)
+        private static void PostFordCarsAlphabetically(string data)
         {
             var obj = JsonConvert.DeserializeObject<Root>(data).Manufacturers;
             var ford = obj.FirstOrDefault(x => x.Name == "Ford");
@@ -66,7 +62,7 @@ namespace ApiCodeScreen
                 carsToReturn.Add(sortedCars[i].Name.ToString());
                 Console.WriteLine(carsToReturn[i]);
             }
-            FordCars fordCars = new FordCars() { Names = carsToReturn };
+            var fordCars = new FordCars() { Names = carsToReturn };
             var json = JsonConvert.SerializeObject(fordCars);
 
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(carNamesPostUrl);
@@ -83,7 +79,7 @@ namespace ApiCodeScreen
             Console.WriteLine("Alphabetized Ford Cars Posted Status: " + httpResponse.StatusCode.ToString());
         }
 
-        private static void PostCarColors(string carColorsPostUrl,string data)
+        private static void PostCarColors(string data)
         {
             var obj = JsonConvert.DeserializeObject<Root>(data).Manufacturers;
             var chevyCars = obj.FirstOrDefault(x => x.Name == "Chevy").Cars;
@@ -107,7 +103,7 @@ namespace ApiCodeScreen
             {
                 Console.WriteLine(color);
             }
-            ChevyColors chevyColors = new ChevyColors() { Colors = uniqueColorsToReturn };
+            var chevyColors = new ChevyColors() { Colors = uniqueColorsToReturn };
             var json = JsonConvert.SerializeObject(chevyColors);
 
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(carColorsPostUrl);
