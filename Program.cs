@@ -17,8 +17,17 @@ namespace ApiCodeScreen
         static void Main(string[] args)
         {
             var data = GetManufacturers();
-            PostFordCarsAlphabetically(data);
-            PostCarColors(data);
+            var obj = JsonConvert.DeserializeObject<Root>(data).Manufacturers;
+            if (obj != null)
+            {
+                PostFordCarsAlphabetically(obj);
+                PostCarColors(obj);
+            }
+            else
+            {
+                Console.WriteLine("obj was null");
+            }
+            
         }
 
         private static string GetManufacturers()
@@ -42,9 +51,8 @@ namespace ApiCodeScreen
             return data;
         }
 
-        private static void PostFordCarsAlphabetically(string data)
+        private static void PostFordCarsAlphabetically(List<Manufacturer> obj)
         {
-            var obj = JsonConvert.DeserializeObject<Root>(data).Manufacturers;
             var ford = obj.FirstOrDefault(x => x.Name == "Ford");
             var cars = ford.Cars;
             Console.WriteLine();
@@ -79,9 +87,8 @@ namespace ApiCodeScreen
             Console.WriteLine("Alphabetized Ford Cars Posted Status: " + httpResponse.StatusCode.ToString());
         }
 
-        private static void PostCarColors(string data)
+        private static void PostCarColors(List<Manufacturer> obj)
         {
-            var obj = JsonConvert.DeserializeObject<Root>(data).Manufacturers;
             var chevyCars = obj.FirstOrDefault(x => x.Name == "Chevy").Cars;
             var carColors = chevyCars.Select(x => x.Colors).ToList();
             var allColors = new List<string>();
